@@ -3,15 +3,15 @@
   "version": "1.0.0",
   "description": "This is the backend for the DnD Character Manager, a web application that helps players create and manage their Dungeons & Dragons characters digitally. The backend handles authentication, character data storage, and API endpoints for user interactions.",
   "type": "module",
-  "main": "server.js",
+  "main": "server.ts",
   "scripts": {
-    "start": "node dist/server.js",
+    "start": "node dist/server.ts",
     "dev": "ts-node-dev --respawn src/server.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc"
   },
   "keywords": [],
-  "author": "",
+  "author": "djaevil",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^3.0.2",

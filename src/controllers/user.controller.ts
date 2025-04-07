@@ -1,73 +1,83 @@
-import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
-import { Request, Response } from 'express';
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
+import { RequestHandler } from "express";
 
-import User from '../models/user.model';
+import User from "../models/user.model.ts";
 
+const registerUser: RequestHandler = async (req, res) => {
+  const { username, email, password } = req.body;
 
-const registerUser = async (req: Request, res: Response) => { // Not Finished!!
-    const { username, email, password } = req.body;
-  
-    try {
-      const existingUser = await User.findOne({ email });
-      if (existingUser) return res.status(400).json({ error: "User already exists" });
-  
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const user = await User.create({ username, email, password: hashedPassword });
-  
-      res.status(201).json({ message: "User registered successfully" });
-    } catch (error) {
+  try {
+    const existingEmail = await User.findOne({ email });
+    const existingUsername = await User.findOne({ username });
+
+    if (existingEmail || existingUsername) {
+      if (existingEmail) {
+        res.status(400).json({ error: "Email already exists" });
+        return;
+      } else if (existingUsername) {
+        res.status(400).json({ error: "Username already exists" });
+        return;
+      } else {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const user = await User.create({
+          username,
+          email,
+          password: hashedPassword,
+        });
+
+        if (!user) {
+          res.status(400).json({ error: "User registration failed" });
+          return;
+        }
+
+        res.status(201).json({ message: "User registered successfully" });
+        return;
+      }
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      res.status(500).json({ error: error.message });
+    } else {
       res.status(500).json({ error: "Server error" });
     }
-  };
-  
-const loginUser = async (req: Request, res: Response) => {
-    if (!req.body.username || !req.body.password) {
-        res.status(400).send({
-          message: "Content can not be empty!",
-        });
-        return;
+    return;
+  }
+};
+
+const loginUser: RequestHandler = async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    const user = await User.authenticate(username, password);
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, {
+      expiresIn: "7d",
+    });
+    const refreshToken = jwt.sign(
+      { id: user._id },
+      process.env.JWT_REFRESH_SECRET!,
+      { expiresIn: "7d" }
+    );
+
+    const Obj = {
+      token: token,
+      refreshToken: refreshToken,
+      user: { id: user._id, username: user.username, email: user.email },
+    };
+
+    res.status(200).json(Obj);
+    return;
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "Invalid username or password"
+    ) {
+      res.status(401).json({ error: "Invalid credentials" });
+    } else {
+      res.status(500).json({ error: "Server error" });
     }
-  
-    const { username, password } = req.body;
-
-    try {
-        let user = await User.authenticate(username, password);
-
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!, { expiresIn: "7d" });
-        const refreshToken = jwt.sign({ id: user._id }, process.env.JWT_REFRESH_SECRET!, { expiresIn: "7d" });
-
-        const Obj = {
-            token: token,
-            refreshToken: refreshToken,
-            user: {
-                id: user._id,
-                username: user.username,
-                email: user.email,
-            },
-        };
-  
-        res.status(200).json(Obj);
-    } catch (error) {
-        if (error instanceof Error && error.message === "Invalid username or password") {
-            return res.status(401).json({ error: "Invalid credentials" });
-        }
-        res.status(500).json({ error: "Server error" });
-    }
+    return;
+  }
 };
 
 export { registerUser, loginUser };
-
-
-// export const loginUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-//     try {
-//         const user = await authenticateUser(req.body);
-//         if (!user) {
-//             res.status(401).json({ message: "Invalid credentials" });
-//             return;
-//         }
-//         res.status(200).json({ token: generateToken(user) });
-//     } catch (error) {
-//         next(error);
-//     }
-// };
