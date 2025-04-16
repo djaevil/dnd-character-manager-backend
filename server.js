@@ -1,11 +1,11 @@
-import app from "./app.ts";
-import mongoose from "mongoose";
-import dotenv from "dotenv";
+const app = require("./src/app");
+const mongoose = require("mongoose");
+const dotenv = require("dotenv");
 
 dotenv.config();
 
 mongoose
-  .connect(process.env.MONGO_URI!, {
+  .connect(process.env.MONGO_URI, {
     serverSelectionTimeoutMS: 30000,
     socketTimeoutMS: 45000,
     retryWrites: true,

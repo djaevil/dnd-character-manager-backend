@@ -1,7 +1,4 @@
-import { RequestHandler } from 'express';
-import { ObjectSchema } from 'joi';
-
-export const validateDto = (schema: ObjectSchema): RequestHandler => {
+const validateDto = (schema) => {
   return (req, res, next) => {
     const { error } = schema.validate(req.body);
     if (error) {
@@ -11,3 +8,5 @@ export const validateDto = (schema: ObjectSchema): RequestHandler => {
     }
   };
 };
+
+module.exports = validateDto;
