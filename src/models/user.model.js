@@ -35,7 +35,7 @@ userSchema.statics.authenticate = async function (username, password) {
   if (bcrypt.compareSync(password, user.password)) {
     return user;
   }
-  throw new Error("Something went wrong");
+  throw new Error("Invalid username or password");
 };
 
 userSchema.statics.validate = async function (auth) {

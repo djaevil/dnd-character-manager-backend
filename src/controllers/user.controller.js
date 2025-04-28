@@ -63,7 +63,7 @@ const loginUser = async (req, res) => {
     if (error.message === "Invalid username or password") {
       res.status(401).json({ error: "Invalid credentials" });
     } else {
-      res.status(500).json({ error: "Server error" });
+      res.status(500).json({ error: error.message || "Server error" });
     }
   }
 };
