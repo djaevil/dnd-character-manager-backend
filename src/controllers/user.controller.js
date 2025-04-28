@@ -44,18 +44,30 @@ const loginUser = async (req, res) => {
   try {
     const user = await User.authenticate(username, password);
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "7d",
+      expiresIn: "1d",
     });
     const refreshToken = jwt.sign(
       { id: user._id },
       process.env.JWT_REFRESH_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "3d" }
     );
 
+    res.cookie("token", token, {
+      httpOnly: true,
+      // secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 1 * 24 * 60 * 60 * 1000,
+    });
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      // secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 3 * 24 * 60 * 60 * 1000,
+    });
+
     const responseObj = {
-      token: token,
-      refreshToken: refreshToken,
-      user: { id: user._id, username: user.username, email: user.email },
+      user: { username: user.username },
     };
 
     res.status(200).json(responseObj);
