@@ -43,34 +43,38 @@ const loginUser = async (req, res) => {
 
   try {
     const user = await User.authenticate(username, password);
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "1d",
-    });
-    const refreshToken = jwt.sign(
-      { id: user._id },
-      process.env.JWT_REFRESH_SECRET,
-      { expiresIn: "3d" }
-    );
+    if (user) {
+      const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+        expiresIn: "1d",
+      });
+      const refreshToken = jwt.sign(
+        { id: user._id },
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: "3d" }
+      );
 
-    res.cookie("token", token, {
-      httpOnly: true,
-      // secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 1 * 24 * 60 * 60 * 1000,
-    });
+      res.cookie("token", token, {
+        httpOnly: true,
+        // secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 1 * 24 * 60 * 60 * 1000,
+      });
 
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      // secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 3 * 24 * 60 * 60 * 1000,
-    });
+      res.cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        // secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 3 * 24 * 60 * 60 * 1000,
+      });
 
-    const responseObj = {
-      user: { username: user.username },
-    };
+      const responseObj = {
+        user: { username: user.username },
+      };
 
-    res.status(200).json(responseObj);
+      res.status(200).json(responseObj);
+    } else {
+      throw new Error("Invalid username or password");
+    }
   } catch (error) {
     if (error.message === "Invalid username or password") {
       res.status(401).json({ error: "Invalid credentials" });
