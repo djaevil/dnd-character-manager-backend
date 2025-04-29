@@ -57,27 +57,12 @@ const loginUser = async (req, res) => {
         { expiresIn: "3d" }
       );
 
-      res.cookie("token", token, {
-        httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 1 * 24 * 60 * 60 * 1000,
-      });
-
-      res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        // secure: process.env.NODE_ENV === "production",
-        sameSite: "strict",
-        maxAge: 3 * 24 * 60 * 60 * 1000,
-      });
-
       const responseObj = {
-        user: { username: user.username },
+        token: token,
+        refreshToken: refreshToken,
       };
 
       res.status(200).json(responseObj);
-    } else {
-      throw new Error("Invalid username or password");
     }
   } catch (error) {
     if (error.message === "Invalid username or password") {
@@ -88,4 +73,17 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser };
+const verifyAuthToken = async (req, res) => {
+  const user = await User.validate(req.headers);
+  if (!user) {
+    return res.status(401).json({ error: "Unauthorized or expired token!" });
+  } else {
+    const obj = {
+      username: user.username,
+      email: user.email,
+    };
+    res.status(200).json(obj);
+  }
+};
+
+module.exports = { registerUser, loginUser, verifyAuthToken };
