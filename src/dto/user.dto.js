@@ -6,7 +6,11 @@ const registerUserDTO = Joi.object({
   password: Joi.string()
     .min(6)
     .max(50)
-    .pattern(new RegExp("^[a-zA-Z0-9]{6,30}$"))
+    .pattern(
+      new RegExp(
+        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d!@#$%^&*()_+\\-=\\[\\]{};':\"\\|,.<>\\/?]{6,50}$"
+      )
+    )
     .required(),
   confirmPassword: Joi.ref("password"),
 }).with("password", "confirmPassword");
