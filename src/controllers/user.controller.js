@@ -74,16 +74,8 @@ const loginUser = async (req, res) => {
 };
 
 const verifyAuthToken = async (req, res) => {
-  const user = await User.validate(req.headers);
-  if (!user) {
-    return res.status(401).json({ error: "Unauthorized or expired token!" });
-  } else {
-    const obj = {
-      username: user.username,
-      email: user.email,
-    };
-    res.status(200).json(obj);
-  }
+  const { username, email } = req.user;
+  res.status(200).json({ username, email });
 };
 
 module.exports = { registerUser, loginUser, verifyAuthToken };
