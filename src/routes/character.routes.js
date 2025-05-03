@@ -3,8 +3,8 @@ const {
   getCharacters,
   getCharacterById,
   createCharacter,
-  // updateCharacter,
-  // deleteCharacter,
+  updateCharacter,
+  deleteCharacter,
 } = require("../controllers/character.controller");
 const validateDto = require("../middleware/validateDto.middleware");
 const { characterDTO } = require("../dto/character.dto");
@@ -16,7 +16,7 @@ router.use(authMiddleware);
 router.get("/", getCharacters);
 router.get("/:id", getCharacterById);
 router.post("/", validateDto(characterDTO), createCharacter);
-// router.put("/:id", validateDto(characterSchema), updateCharacter);
-// router.delete("/:id", deleteCharacter);
+router.put("/:id", validateDto(characterDTO), updateCharacter);
+router.delete("/:id", deleteCharacter);
 
 module.exports = router;
