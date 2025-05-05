@@ -4,17 +4,17 @@ const characterDTO = Joi.object({
   name: Joi.string().min(1).max(100).required(),
   race: Joi.string().allow("").optional(),
   class: Joi.string().allow("").optional(),
-  level: Joi.number().integer().min(1).max(20).default(1),
-  healthPoints: Joi.number().integer().min(0).optional(),
+  level: Joi.number().integer().min(1).required(),
+  healthPoints: Joi.number().integer().min(0).max(1000).optional(),
   background: Joi.string().allow("").optional(),
 
   stats: Joi.object({
-    strength: Joi.number().integer().min(0).max(30),
-    dexterity: Joi.number().integer().min(0).max(30),
-    constitution: Joi.number().integer().min(0).max(30),
-    intelligence: Joi.number().integer().min(0).max(30),
-    wisdom: Joi.number().integer().min(0).max(30),
-    charisma: Joi.number().integer().min(0).max(30),
+    strength: Joi.number().integer().min(0).max(40),
+    dexterity: Joi.number().integer().min(0).max(40),
+    constitution: Joi.number().integer().min(0).max(40),
+    intelligence: Joi.number().integer().min(0).max(40),
+    wisdom: Joi.number().integer().min(0).max(40),
+    charisma: Joi.number().integer().min(0).max(40),
   }).optional(),
 
   skills: Joi.object({
