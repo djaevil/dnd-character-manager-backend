@@ -3,9 +3,7 @@ const Character = require("../models/character.model");
 const getCharacters = async (req, res) => {
   try {
     const userId = req.user._id;
-    if (!userId) {
-      return res.status(401).json({ error: "Unauthorized" });
-    }
+
     const characters = await Character.find({ owner: userId }).populate(
       "owner",
       "-_id -password -__v -createdAt -updatedAt"
@@ -23,12 +21,13 @@ const getCharacters = async (req, res) => {
 
 const getCharacterById = async (req, res) => {
   try {
+    const userId = req.user._id;
     const characterId = req.params.id;
 
-    const character = await Character.findById(characterId).populate(
-      "owner",
-      "-_id -password -__v -createdAt -updatedAt"
-    );
+    const character = await Character.findOne({
+      _id: characterId,
+      owner: userId,
+    }).populate("owner", "-_id -password -__v -createdAt -updatedAt");
     if (!character) {
       return res.status(404).json({ error: "Character not found" });
     }
@@ -71,7 +70,7 @@ const updateCharacter = async (req, res) => {
       { new: true }
     ).populate("owner", "-_id -password -__v -createdAt -updatedAt");
 
-    if (!updatedCharacter || updatedCharacter === null) {
+    if (!updatedCharacter) {
       return res.status(404).json({ error: "Character not found" });
     }
     res.status(200).json(updatedCharacter);
