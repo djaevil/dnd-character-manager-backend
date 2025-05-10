@@ -9,8 +9,6 @@ mongoose
     serverSelectionTimeoutMS: 30000,
     socketTimeoutMS: 45000,
     retryWrites: true,
-    // tls: true,
-    // ssl: true,
   })
   .then(() => {
     app.listen(process.env.PORT, () =>
